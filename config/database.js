@@ -1,19 +1,25 @@
 const mysql = require("mysql");
+
 const { Sequelize } = require("sequelize");
 
 const connection = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "quiz",
+  host: process.env.DB_HOST || "localhost",
+  user: process.env.DB_USER || "root",
+  password: process.env.DB_PASSWORD || "",
+  database: process.env.DB_NAME || "quiz",
 });
 
 connection.connect();
 
-const sequelize = new Sequelize("quiz", "root", "", {
-  host: "localhost",
-  dialect: "mysql",
-  port: 3306
-});
+const sequelize = new Sequelize(
+  process.env.DB_NAME || "quiz",
+  process.env.DB_USER || "root",
+  process.env.DB_PASSWORD || "",
+  {
+    host: process.env.DB_HOST || "localhost",
+    dialect: "mysql",
+    port: process.env.DB_PORT || 3306,
+  }
+);
 
 module.exports = { connection, sequelize };
