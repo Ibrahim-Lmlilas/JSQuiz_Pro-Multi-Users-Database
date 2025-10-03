@@ -12,5 +12,18 @@ function auth(req, res, next) {
         next();
     });
 }
-
-module.exports = auth;
+function getUser(req) {
+    const jwtToken = req.cookies["jwtToken"];
+    if (!jwtToken) {
+        return null;
+    }
+    try {
+        const decoded = jwt.decode(jwtToken, process.env.TOKEN_SECRET);
+        console.log(decoded);
+        
+        return decoded;
+    } catch (err) {
+        return null;
+    }
+}
+module.exports = {auth, getUser};
