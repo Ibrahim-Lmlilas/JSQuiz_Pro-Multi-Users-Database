@@ -18,11 +18,12 @@ function getUser(req) {
         return null;
     }
     try {
-        const decoded = jwt.decode(jwtToken, process.env.TOKEN_SECRET);
+        const decoded = jwt.verify(jwtToken, process.env.TOKEN_SECRET);
         console.log(decoded);
         
         return decoded;
     } catch (err) {
+        console.log("Token verification error:", err.message);
         return null;
     }
 }

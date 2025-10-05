@@ -3,200 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuizMaster - Home</title>
+    <title>Quizzy - Learn, Quiz, Earn Rewards</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        html, body {
+            height: 100vh;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+        
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            background: linear-gradient(135deg, #5813C1 0%, #000000 50%, #C45037 100%);
+            position: relative;
         }
-        .quiz-card {
-            transition: all 0.3s ease;
-            background: white;
+        
+        /* Grid Background Effect */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.062) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.212) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
         }
-        .quiz-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+        
+        body::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(180deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+            background-size: 100px 100px;
+            animation: gridMoveReverse 25s linear infinite;
+            pointer-events: none;
+            z-index: 1;
         }
-        .header-container {
-            animation: slideDown 0.5s ease;
+        
+        @keyframes gridMove {
+            0% {
+                transform: perspective(500px) rotateX(60deg) translateY(0);
+            }
+            100% {
+                transform: perspective(500px) rotateX(60deg) translateY(50px);
+            }
         }
-        @keyframes slideDown {
+        
+        @keyframes gridMoveReverse {
+            0% {
+                transform: perspective(500px) rotateX(60deg) translateY(0);
+            }
+            100% {
+                transform: perspective(500px) rotateX(60deg) translateY(-50px);
+            }
+        }
+        
+        .hero-title {
+            animation: fadeInUp 1s ease;
+        }
+        
+        @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(-20px);
+                transform: translateY(30px);
             }
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-        .quiz-grid {
-            animation: fadeIn 0.6s ease;
-        }
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-        .logout-btn {
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
             transition: all 0.3s ease;
         }
-        .logout-btn:hover {
-            transform: scale(1.05);
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #000000;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: #f3f4f6;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 255, 255, 0.3);
+        }
+        
+        .avatar-group img {
+            border: 3px solid #1f2937;
+        }
+        
+        .quiz-card {
+            background: white;
+            transition: all 0.3s ease;
+        }
+        
+        .quiz-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(139, 92, 246, 0.3);
         }
     </style>
 </head>
-<body class="p-4 md:p-8">
-    <!-- Header -->
-    <div class="header-container max-w-7xl mx-auto mb-8">
-        <div class="bg-white rounded-2xl shadow-lg p-6 flex justify-between items-center flex-wrap gap-4">
-            <!-- Logo and Welcome -->
-            <div class="flex items-center gap-4">
-                <div class="bg-purple-600 rounded-full p-3">
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-800">QuizMaster</h1>
-                    <p class="text-gray-600 text-sm">Welcome back, <span class="font-semibold text-purple-600"><%= userName %></span>!</p>
-                </div>
-            </div>
-            
-            <!-- Logout Button -->
-            <form method="POST" action="/logout">
-                <button type="submit" class="logout-btn bg-red-500 hover:bg-red-600 text-white font-semibold px-6 py-2 rounded-lg shadow">
-                    Logout
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="max-w-7xl mx-auto">
-        <!-- Page Title -->
-        <div class="text-center mb-8">
-            <h2 class="text-4xl font-bold text-white mb-2">Choose Your Quiz</h2>
-            <p class="text-purple-200 text-lg">Select a theme and test your knowledge!</p>
-        </div>
-
-        <!-- Quiz Grid -->
-        <div class="quiz-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <!-- Quiz Card 1 - Science -->
-            <a href="/quiz?theme=science" class="quiz-card rounded-xl p-6 cursor-pointer shadow-lg">
-                <div class="flex flex-col items-center text-center">
-                    <div class="bg-blue-100 rounded-full p-4 mb-4">
-                        <svg class="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Science</h3>
-                    <p class="text-gray-600 text-sm">15 Questions</p>
-                </div>
-            </a>
-
-            <!-- Quiz Card 2 - History -->
-            <a href="/quiz?theme=history" class="quiz-card rounded-xl p-6 cursor-pointer shadow-lg">
-                <div class="flex flex-col items-center text-center">
-                    <div class="bg-amber-100 rounded-full p-4 mb-4">
-                        <svg class="w-12 h-12 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">History</h3>
-                    <p class="text-gray-600 text-sm">20 Questions</p>
-                </div>
-            </a>
-
-            <!-- Quiz Card 3 - Geography -->
-            <a href="/quiz?theme=geography" class="quiz-card rounded-xl p-6 cursor-pointer shadow-lg">
-                <div class="flex flex-col items-center text-center">
-                    <div class="bg-green-100 rounded-full p-4 mb-4">
-                        <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Geography</h3>
-                    <p class="text-gray-600 text-sm">18 Questions</p>
-                </div>
-            </a>
-
-            <!-- Quiz Card 4 - Sports -->
-            <a href="/quiz?theme=sports" class="quiz-card rounded-xl p-6 cursor-pointer shadow-lg">
-                <div class="flex flex-col items-center text-center">
-                    <div class="bg-red-100 rounded-full p-4 mb-4">
-                        <svg class="w-12 h-12 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Sports</h3>
-                    <p class="text-gray-600 text-sm">12 Questions</p>
-                </div>
-            </a>
-
-            <!-- Quiz Card 5 - Movies -->
-            <a href="/quiz?theme=movies" class="quiz-card rounded-xl p-6 cursor-pointer shadow-lg">
-                <div class="flex flex-col items-center text-center">
-                    <div class="bg-purple-100 rounded-full p-4 mb-4">
-                        <svg class="w-12 h-12 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Movies</h3>
-                    <p class="text-gray-600 text-sm">25 Questions</p>
-                </div>
-            </a>
-
-            <!-- Quiz Card 6 - Technology -->
-            <a href="/quiz?theme=technology" class="quiz-card rounded-xl p-6 cursor-pointer shadow-lg">
-                <div class="flex flex-col items-center text-center">
-                    <div class="bg-indigo-100 rounded-full p-4 mb-4">
-                        <svg class="w-12 h-12 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Technology</h3>
-                    <p class="text-gray-600 text-sm">22 Questions</p>
-                </div>
-            </a>
-
-            <!-- Quiz Card 7 - Music -->
-            <a href="/quiz?theme=music" class="quiz-card rounded-xl p-6 cursor-pointer shadow-lg">
-                <div class="flex flex-col items-center text-center">
-                    <div class="bg-pink-100 rounded-full p-4 mb-4">
-                        <svg class="w-12 h-12 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Music</h3>
-                    <p class="text-gray-600 text-sm">16 Questions</p>
-                </div>
-            </a>
-
-            <!-- Quiz Card 8 - Literature -->
-            <a href="/quiz?theme=literature" class="quiz-card rounded-xl p-6 cursor-pointer shadow-lg">
-                <div class="flex flex-col items-center text-center">
-                    <div class="bg-teal-100 rounded-full p-4 mb-4">
-                        <svg class="w-12 h-12 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Literature</h3>
-                    <p class="text-gray-600 text-sm">14 Questions</p>
-                </div>
-            </a>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <div class="text-center mt-12 pb-8">
-        <p class="text-purple-200 text-sm">
-            &copy; 2025 QuizMaster. Challenge yourself every day!
-        </p>
-    </div>
+<body>
+    <%- include('partials/navbar') %>
+    <%- include('partials/hero') %>
+    
 </body>
 </html>

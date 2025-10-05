@@ -20,8 +20,13 @@ app.use(express.urlencoded({ extended: true }));
 // home page
 app.get("/", async(req, res)  => {
   const user = await auth.getUser(req);
-  const userRecord = await User.findOne({ where: user.id });
-  const userName = userRecord.name;
+  
+  if (!user) {
+    return res.render("index", { userName: "Guest" });
+  }
+  
+  const userRecord = await User.findOne({ where: { id: user.id } });
+  const userName = userRecord ? userRecord.name : "Guest";
   res.render("index", { userName: userName});
   
 });
@@ -33,6 +38,11 @@ app.get("/register", (req, res) => {
 
 app.get("/login", (req, res) => {
   res.render("login");
+});
+
+// about page
+app.get("/about", (req, res) => {
+  res.render("about");
 });
 
 // auth routes
