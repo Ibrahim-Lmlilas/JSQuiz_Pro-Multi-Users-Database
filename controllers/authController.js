@@ -12,8 +12,9 @@ function generateAccessToken(id, email) {
   });
 }
 
-async function register(req, res) {
+async function registerController(req, res) {
   try {
+    
     const { name, email, password } = req.body;
 
     //   check if body is empty
@@ -43,6 +44,7 @@ async function register(req, res) {
       where: { id: newUser.role_id },
     });
 
+    res.redirect('/login');
     return res.status(200).json({
       message: "User Created Successfuly",
       id: newUser.id,
@@ -57,7 +59,7 @@ async function register(req, res) {
   }
 }
 
-async function login(req, res) {
+async function loginController(req, res) {
   try {
     const { email, password } = req.body;
 
@@ -74,6 +76,7 @@ async function login(req, res) {
     }
     const jwt = generateAccessToken(existingUser.id, email);
     res.cookie("jwtToken", jwt, { httpOnly: true, secure: true });
+    res.redirect('/');
     return res.status(200).json({
       message: "Loged In Successfuly",
       token: jwt,
@@ -84,8 +87,8 @@ async function login(req, res) {
   }
 }
 
-function logout(req, res) {
+function logoutController(req, res) {
     res.clearCookie("jwtToken");
     res.redirect('/');
 }
-module.exports = { register, login, logout };
+module.exports = { registerController, loginController, logoutController };
