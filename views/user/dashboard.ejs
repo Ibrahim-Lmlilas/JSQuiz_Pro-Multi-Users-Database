@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - Quizzy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: #0a0a0a;
+            color: white;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: #9ca3af;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 4px;
+        }
+
+        .nav-item svg {
+            margin-right: 12px;
+        }
+
+        .nav-item:hover {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .nav-item.active {
+            background: #2563eb;
+            color: white;
+        }
+
+        .stat-card {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .quiz-card {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .quiz-card:hover {
+            transform: translateY(-2px);
+            border-color: #2563eb;
+        }
+
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+    </style>
+</head>
+<body class="flex">
+    <!-- Sidebar -->
+    <%- include('../partials/dashboard/user-sidebar') %>
+
+    <!-- Main Content -->
+    <div class="flex-1 overflow-auto">
+        <!-- Top Bar -->
+        <%- include('../partials/dashboard/navbar') %>
+
+        <!-- Dashboard Content -->
+        <div class="p-8">
+            <!-- Welcome Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold mb-2">Dashboard</h1>
+                <p class="text-gray-400">Track your progress and continue learning</p>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-3 gap-6 mb-8">
+                <div class="stat-card">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-gray-400 text-sm">Quizzes Taken</span>
+                        <div class="w-10 h-10 bg-blue-600/20 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
+                                <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex items-end justify-between">
+                        <div>
+                            <div class="text-3xl font-bold mb-1">45</div>
+                            <div class="text-green-500 text-sm font-medium">+8 this week</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-gray-400 text-sm">Average Score</span>
+                        <div class="w-10 h-10 bg-green-600/20 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex items-end justify-between">
+                        <div>
+                            <div class="text-3xl font-bold mb-1">85%</div>
+                            <div class="text-green-500 text-sm font-medium">+5% improvement</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-gray-400 text-sm">Rank</span>
+                        <div class="w-10 h-10 bg-yellow-600/20 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex items-end justify-between">
+                        <div>
+                            <div class="text-3xl font-bold mb-1">#12</div>
+                            <div class="text-blue-500 text-sm font-medium">Top 5% globally</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Quizzes & Continue Learning -->
+            <div class="grid grid-cols-3 gap-6">
+                <!-- Recent Quizzes -->
+                <div class="col-span-2">
+                    <div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h2 class="text-xl font-bold mb-1">Continue Learning</h2>
+                                <p class="text-gray-400 text-sm">Pick up where you left off</p>
+                            </div>
+                            <button class="text-blue-500 hover:text-blue-400 text-sm font-medium">View All</button>
+                        </div>
+
+                        <!-- Quiz Cards -->
+                        <div class="space-y-4">
+                            <div class="quiz-card">
+                                <div class="flex items-start justify-between mb-3">
+                                    <div>
+                                        <h3 class="font-semibold mb-1">JavaScript Fundamentals</h3>
+                                        <p class="text-sm text-gray-400">20 questions • Intermediate</p>
+                                    </div>
+                                    <span class="bg-blue-600/20 text-blue-400 text-xs font-medium px-3 py-1 rounded-full">In Progress</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex-1">
+                                        <div class="h-2 bg-[#0a0a0a] rounded-full overflow-hidden">
+                                            <div class="h-full bg-blue-600 rounded-full" style="width: 65%"></div>
+                                        </div>
+                                    </div>
+                                    <span class="text-sm text-gray-400 ml-4">65% Complete</span>
+                                </div>
+                            </div>
+
+                            <div class="quiz-card">
+                                <div class="flex items-start justify-between mb-3">
+                                    <div>
+                                        <h3 class="font-semibold mb-1">Python Basics</h3>
+                                        <p class="text-sm text-gray-400">15 questions • Beginner</p>
+                                    </div>
+                                    <span class="bg-green-600/20 text-green-400 text-xs font-medium px-3 py-1 rounded-full">Completed</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center text-sm text-gray-400">
+                                        <svg class="w-4 h-4 text-yellow-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                        </svg>
+                                        Score: 92%
+                                    </div>
+                                    <span class="text-sm text-gray-400">2 days ago</span>
+                                </div>
+                            </div>
+
+                            <div class="quiz-card">
+                                <div class="flex items-start justify-between mb-3">
+                                    <div>
+                                        <h3 class="font-semibold mb-1">React Hooks Deep Dive</h3>
+                                        <p class="text-sm text-gray-400">25 questions • Advanced</p>
+                                    </div>
+                                    <span class="bg-gray-600/20 text-gray-400 text-xs font-medium px-3 py-1 rounded-full">Not Started</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <p class="text-sm text-gray-400">Start this quiz to test your advanced React knowledge</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Leaderboard -->
+                <div class="col-span-1">
+                    <div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6">
+                        <div class="mb-6">
+                            <h2 class="text-xl font-bold mb-1">Leaderboard</h2>
+                            <p class="text-gray-400 text-sm">Top performers this week</p>
+                        </div>
+
+                        <div class="space-y-4">
+                            <!-- Top Student -->
+                            <div class="flex items-center space-x-3 p-3 rounded-lg bg-gradient-to-r from-yellow-600/10 to-orange-600/10 border border-yellow-600/20">
+                                <div class="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-full flex items-center justify-center text-sm font-bold">
+                                    1
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-sm font-semibold truncate">Alex Johnson</div>
+                                    <div class="text-xs text-gray-400">Science</div>
+                                </div>
+                                <div class="flex items-center text-yellow-500">
+                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                    </svg>
+                                    <span class="text-sm font-bold">950</span>
+                                </div>
+                            </div>
+
+                            <!-- Other Students -->
+                            <div class="flex items-center space-x-3 p-3 rounded-lg hover:bg-[#0a0a0a] transition">
+                                <div class="flex-shrink-0 w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center text-sm font-bold">
+                                    2
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-sm font-semibold truncate">Emma Watson</div>
+                                    <div class="text-xs text-gray-400">Mathematics</div>
+                                </div>
+                                <div class="text-sm font-bold text-orange-500">920</div>
+                            </div>
+
+                            <div class="flex items-center space-x-3 p-3 rounded-lg hover:bg-[#0a0a0a] transition">
+                                <div class="flex-shrink-0 w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center text-sm font-bold">
+                                    3
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-sm font-semibold truncate">Michael Clark</div>
+                                    <div class="text-xs text-gray-400">Physics</div>
+                                </div>
+                                <div class="text-sm font-bold text-orange-500">900</div>
+                            </div>
+
+                            <div class="flex items-center space-x-3 p-3 rounded-lg bg-blue-600/10 border border-blue-600/20">
+                                <div class="flex-shrink-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-sm font-bold">
+                                    12
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-sm font-semibold truncate">You</div>
+                                    <div class="text-xs text-gray-400">All subjects</div>
+                                </div>
+                                <div class="text-sm font-bold text-blue-500">780</div>
+                            </div>
+                        </div>
+
+                        <button class="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg font-medium transition">
+                            View Full Leaderboard
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

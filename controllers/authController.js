@@ -80,8 +80,14 @@ async function loginController(req, res) {
     const token = generateAccessToken(existingUser.id, email);
     res.cookie("jwtToken", token, { httpOnly: true, secure: false }); // secure: false for development
     
-    //   redirect to home
-    return res.redirect('/');
+    //   redirect based on user role
+    if (existingUser.role_id === 2) {
+      // Admin user
+      return res.redirect('/admin/dashboard');
+    } else {
+      // Regular user
+      return res.redirect('/user/dashboard');
+    }
   } catch (error) {
     console.log(error);
     return res.status(401).send("Error while Login");

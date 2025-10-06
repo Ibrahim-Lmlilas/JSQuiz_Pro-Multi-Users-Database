@@ -3,6 +3,7 @@ const express = require("express");
 const { sequelize } = require("./config/database");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
+const themeRoutes = require("./routes/themeRoutes");
 const auth = require("./middlewares/auth");
 const dotenv = require("dotenv");
 dotenv.config();
@@ -11,6 +12,7 @@ const port = 3000;
 
 const cookieParser = require("cookie-parser");
 const User = require("./models/userModel");
+const { requireAdmin, requireUser } = require("./middlewares/roleCheck");
 app.set("view engine", "ejs");
 
 app.use(cookieParser());
@@ -45,9 +47,31 @@ app.get("/about", (req, res) => {
   res.render("about");
 });
 
+// Dashboard routes with role protection
+app.get("/user/dashboard", requireUser, async (req, res) => {
+  res.render("userDashboard");
+});
+
+app.get("/admin/dashboard", requireAdmin, async (req, res) => {
+  res.render("admin/dashboard");
+});
+
+app.get("/admin/students", requireAdmin, async (req, res) => {
+  res.render("admin/students");
+});
+
+app.get("/admin/quizzes", requireAdmin, async (req, res) => {
+  res.render("admin/quizzes");
+});
+
+app.get("/admin/settings", requireAdmin, async (req, res) => {
+  res.render("admin/settings");
+});
+
 // auth routes
 app.use("/auth", authRoutes);
 app.use("/users", auth.auth, userRoutes);
+app.use("/api/themes", themeRoutes);
 
 app.listen(port, async () => {
   try {

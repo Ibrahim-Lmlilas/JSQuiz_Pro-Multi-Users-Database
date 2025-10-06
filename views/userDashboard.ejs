@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - Quizzy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: #0a0a0a;
+            color: white;
+        }
+
+        .sidebar {
+            background: #1a1a1a;
+            border-right: 1px solid #2a2a2a;
+        }
+
+        .sidebar-item {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .sidebar-item:hover {
+            background: #2a2a2a;
+        }
+
+        .sidebar-item.active {
+            background: #7c3aed;
+            color: white;
+        }
+
+        .stat-card {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .quiz-card {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .quiz-card:hover {
+            transform: translateY(-2px);
+            border-color: #7c3aed;
+            box-shadow: 0 8px 24px rgba(124, 58, 237, 0.2);
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #2a2a2a;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body class="flex">
+    <!-- Sidebar -->
+    <div class="sidebar w-64 min-h-screen flex flex-col p-4">
+        <!-- Logo -->
+        <div class="flex items-center space-x-2 mb-8 px-2">
+            <div class="w-8 h-8 bg-gradient-to-br from-purple-600 to-blue-500 rounded-lg flex items-center justify-center">
+                <span class="text-white text-lg font-bold">Q</span>
+            </div>
+            <span class="text-xl font-bold text-white">Quizzy</span>
+        </div>
+
+        <!-- Search -->
+        <div class="mb-6 px-2">
+            <div class="relative">
+                <input type="text" placeholder="Search..." class="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-lg py-2 pl-10 pr-4 text-sm text-gray-300 focus:outline-none focus:border-purple-600">
+                <svg class="w-5 h-5 absolute left-3 top-2.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1">
+            <div class="sidebar-item active flex items-center space-x-3 px-4 py-3 rounded-lg mb-1">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"></path>
+                </svg>
+                <span class="font-medium">Dashboard</span>
+            </div>
+
+            <div class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg mb-1 text-gray-400">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
+                    <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="font-medium">My Quizzes</span>
+            </div>
+
+            <div class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg mb-1 text-gray-400">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path>
+                </svg>
+                <span class="font-medium">Leaderboard</span>
+            </div>
+
+            <div class="my-4 px-2">
+                <div class="h-px bg-[#2a2a2a]"></div>
+            </div>
+
+            <div class="sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="font-medium">Profile</span>
+            </div>
+        </nav>
+
+        <!-- Logout -->
+        <form action="/auth/logout" method="POST" class="px-2">
+            <button type="submit" class="w-full sidebar-item flex items-center space-x-3 px-4 py-3 rounded-lg text-red-400 hover:bg-red-500/10">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="font-medium">Logout</span>
+            </button>
+        </form>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 overflow-auto">
+        <!-- Top Bar -->
+        <div class="bg-[#0a0a0a] border-b border-[#2a2a2a] px-8 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <input type="text" placeholder="Search quizzes..." class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg py-2 px-4 text-sm text-gray-300 w-80 focus:outline-none focus:border-purple-600">
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="text-right">
+                    <div class="text-sm font-semibold">Welcome back!</div>
+                    <div class="text-xs text-gray-400">Keep learning 🎯</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div class="p-8">
+            <!-- Welcome Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold mb-2">Salam User 👋</h1>
+                <p class="text-gray-400">Ready to take a quiz today? Check out your progress below!</p>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-4 gap-6 mb-8">
+                <div class="stat-card">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-gray-400 text-sm">Quizzes Taken</span>
+                        <div class="w-10 h-10 bg-blue-600/20 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
+                                <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-bold">24</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-gray-400 text-sm">Average Score</span>
+                        <div class="w-10 h-10 bg-green-600/20 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-bold">85%</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-gray-400 text-sm">Total Points</span>
+                        <div class="w-10 h-10 bg-orange-600/20 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"></path>
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-bold">1,850</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-gray-400 text-sm">Rank</span>
+                        <div class="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-bold">#12</div>
+                </div>
+            </div>
+
+            <!-- Available Quizzes & Recent Activity -->
+            <div class="grid grid-cols-3 gap-6">
+                <!-- Available Quizzes -->
+                <div class="col-span-2">
+                    <div class="mb-6 flex items-center justify-between">
+                        <h2 class="text-xl font-bold">Available Quizzes</h2>
+                        <button class="text-sm text-purple-500 hover:text-purple-400">View All →</button>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- Quiz 1 -->
+                        <div class="quiz-card">
+                            <div class="flex items-start justify-between mb-3">
+                                <div>
+                                    <h3 class="font-semibold text-lg mb-1">Introduction to Biology</h3>
+                                    <p class="text-sm text-gray-400">Learn the basics of cell structure</p>
+                                </div>
+                                <span class="bg-green-600/20 text-green-400 text-xs font-semibold px-3 py-1 rounded-full">Easy</span>
+                            </div>
+                            <div class="flex items-center gap-6 mb-4 text-sm text-gray-400">
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span>15 questions</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span>20 mins</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                    </svg>
+                                    <span>100 points</span>
+                                </div>
+                            </div>
+                            <button class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2.5 rounded-lg transition">
+                                Start Quiz
+                            </button>
+                        </div>
+
+                        <!-- Quiz 2 -->
+                        <div class="quiz-card">
+                            <div class="flex items-start justify-between mb-3">
+                                <div>
+                                    <h3 class="font-semibold text-lg mb-1">Advanced Mathematics</h3>
+                                    <p class="text-sm text-gray-400">Calculus and algebra challenges</p>
+                                </div>
+                                <span class="bg-orange-600/20 text-orange-400 text-xs font-semibold px-3 py-1 rounded-full">Hard</span>
+                            </div>
+                            <div class="flex items-center gap-6 mb-4 text-sm text-gray-400">
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span>25 questions</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span>45 mins</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                    </svg>
+                                    <span>250 points</span>
+                                </div>
+                            </div>
+                            <button class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2.5 rounded-lg transition">
+                                Start Quiz
+                            </button>
+                        </div>
+
+                        <!-- Quiz 3 -->
+                        <div class="quiz-card">
+                            <div class="flex items-start justify-between mb-3">
+                                <div>
+                                    <h3 class="font-semibold text-lg mb-1">World History Trivia</h3>
+                                    <p class="text-sm text-gray-400">Test your knowledge of historical events</p>
+                                </div>
+                                <span class="bg-yellow-600/20 text-yellow-400 text-xs font-semibold px-3 py-1 rounded-full">Medium</span>
+                            </div>
+                            <div class="flex items-center gap-6 mb-4 text-sm text-gray-400">
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span>20 questions</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span>30 mins</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                    </svg>
+                                    <span>150 points</span>
+                                </div>
+                            </div>
+                            <button class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2.5 rounded-lg transition">
+                                Start Quiz
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="col-span-1">
+                    <div class="mb-6">
+                        <h2 class="text-xl font-bold">Recent Activity</h2>
+                    </div>
+
+                    <div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6">
+                        <div class="space-y-6">
+                            <!-- Activity 1 -->
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-semibold">Physics Quiz</span>
+                                    <span class="text-xs text-gray-500">2 days ago</span>
+                                </div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs text-gray-400">Score: 18/20</span>
+                                    <span class="text-sm font-bold text-green-500">90%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 90%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Activity 2 -->
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-semibold">Chemistry Basics</span>
+                                    <span class="text-xs text-gray-500">3 days ago</span>
+                                </div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs text-gray-400">Score: 14/20</span>
+                                    <span class="text-sm font-bold text-yellow-500">70%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 70%; background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%)"></div>
+                                </div>
+                            </div>
+
+                            <!-- Activity 3 -->
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-semibold">English Literature</span>
+                                    <span class="text-xs text-gray-500">5 days ago</span>
+                                </div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs text-gray-400">Score: 19/20</span>
+                                    <span class="text-sm font-bold text-green-500">95%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 95%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Activity 4 -->
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-semibold">Geography</span>
+                                    <span class="text-xs text-gray-500">1 week ago</span>
+                                </div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs text-gray-400">Score: 16/20</span>
+                                    <span class="text-sm font-bold text-green-500">80%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 80%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- View All Button -->
+                        <button class="w-full mt-6 bg-[#2a2a2a] hover:bg-[#3a3a3a] text-white font-medium py-2.5 rounded-lg transition text-sm">
+                            View All Activity
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

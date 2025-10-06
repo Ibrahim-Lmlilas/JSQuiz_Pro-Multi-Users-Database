@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quizzes - Quizzy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: #0a0a0a;
+            color: white;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: #9ca3af;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 4px;
+        }
+
+        .nav-item svg {
+            margin-right: 12px;
+        }
+
+        .nav-item:hover {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .nav-item.active {
+            background: #7c3aed;
+            color: white;
+        }
+
+        .quiz-card {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .quiz-card:hover {
+            transform: translateY(-4px);
+            border-color: #7c3aed;
+            box-shadow: 0 8px 24px rgba(124, 58, 237, 0.2);
+        }
+
+        .quiz-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body class="flex">
+    <!-- Sidebar -->
+    <%- include('../partials/dashboard/admin-sidebar') %>
+
+    <!-- Main Content -->
+    <div class="flex-1 overflow-auto">
+        <!-- Top Bar -->
+        <%- include('../partials/dashboard/navbar') %>
+
+        <!-- Quizzes Content -->
+        <div class="p-8">
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold mb-2">Quizzes</h1>
+                    <p class="text-gray-400">Create, manage and analyze your quizzes</p>
+                </div>
+                <button class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2.5 rounded-lg font-medium flex items-center space-x-2 transition">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span>Create New Quiz</span>
+                </button>
+            </div>
+
+            <!-- Quiz Library -->
+            <div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6">
+                <!-- Library Header -->
+                <div class="mb-6">
+                    <h2 class="text-xl font-bold mb-1">Quiz Library</h2>
+                    <p class="text-gray-400 text-sm">Browse and manage all your quizzes</p>
+                </div>
+
+                <!-- Quiz Cards -->
+                <div class="space-y-4">
+                    <!-- Quiz 1: Introduction to Biology -->
+                    <div class="quiz-card">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-start space-x-4 flex-1">
+                                <!-- Quiz Icon -->
+                                <div class="quiz-icon bg-purple-600/20 text-purple-500">
+                                    📚
+                                </div>
+                                
+                                <!-- Quiz Info -->
+                                <div class="flex-1">
+                                    <h3 class="text-lg font-bold mb-1">Introduction to Biology</h3>
+                                    <p class="text-sm text-gray-400 mb-4">Basic concepts of biology for beginners</p>
+                                    
+                                    <!-- Quiz Stats -->
+                                    <div class="flex items-center space-x-6 text-sm text-gray-400">
+                                        <div class="flex items-center space-x-2">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
+                                                <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            <span>15 questions</span>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            <span>20 min</span>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"></path>
+                                            </svg>
+                                            <span>32 completions</span>
+                                        </div>
+                                        <div class="flex items-center space-x-2 text-gray-500">
+                                            <span>Created just now</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="flex items-center space-x-2">
+                                <button class="px-4 py-2 bg-[#0a0a0a] hover:bg-purple-600 border border-[#2a2a2a] rounded-lg text-sm font-medium transition">
+                                    View
+                                </button>
+                                <button class="p-2 hover:bg-[#0a0a0a] rounded-lg transition">
+                                    <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quiz 2: Advanced Mathematics -->
+                    <div class="quiz-card">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-start space-x-4 flex-1">
+                                <!-- Quiz Icon -->
+                                <div class="quiz-icon bg-blue-600/20 text-blue-500">
+                                    🔢
+                                </div>
+                                
+                                <!-- Quiz Info -->
+                                <div class="flex-1">
+                                    <h3 class="text-lg font-bold mb-1">Advanced Mathematics</h3>
+                                    <p class="text-sm text-gray-400 mb-4">Basic concepts of biology for beginners</p>
+                                    
+                                    <!-- Quiz Stats -->
+                                    <div class="flex items-center space-x-6 text-sm text-gray-400">
+                                        <div class="flex items-center space-x-2">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
+                                                <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            <span>15 questions</span>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            <span>20 min</span>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"></path>
+                                            </svg>
+                                            <span>32 completions</span>
+                                        </div>
+                                        <div class="flex items-center space-x-2 text-gray-500">
+                                            <span>Created just now</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="flex items-center space-x-2">
+                                <button class="px-4 py-2 bg-[#0a0a0a] hover:bg-purple-600 border border-[#2a2a2a] rounded-lg text-sm font-medium transition">
+                                    View
+                                </button>
+                                <button class="p-2 hover:bg-[#0a0a0a] rounded-lg transition">
+                                    <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quiz 3: Chemistry Fundamentals -->
+                    <div class="quiz-card">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-start space-x-4 flex-1">
+                                <!-- Quiz Icon -->
+                                <div class="quiz-icon bg-green-600/20 text-green-500">
+                                    ⚗️
+                                </div>
+                                
+                                <!-- Quiz Info -->
+                                <div class="flex-1">
+                                    <h3 class="text-lg font-bold mb-1">Chemistry Fundamentals</h3>
+                                    <p class="text-sm text-gray-400 mb-4">Basic concepts of biology for beginners</p>
+                                    
+                                    <!-- Quiz Stats -->
+                                    <div class="flex items-center space-x-6 text-sm text-gray-400">
+                                        <div class="flex items-center space-x-2">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
+                                                <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            <span>15 questions</span>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            <span>20 min</span>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"></path>
+                                            </svg>
+                                            <span>32 completions</span>
+                                        </div>
+                                        <div class="flex items-center space-x-2 text-gray-500">
+                                            <span>Created just now</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="flex items-center space-x-2">
+                                <button class="px-4 py-2 bg-[#0a0a0a] hover:bg-purple-600 border border-[#2a2a2a] rounded-lg text-sm font-medium transition">
+                                    View
+                                </button>
+                                <button class="p-2 hover:bg-[#0a0a0a] rounded-lg transition">
+                                    <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quiz 4: Physics Basics -->
+                    <div class="quiz-card">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-start space-x-4 flex-1">
+                                <!-- Quiz Icon -->
+                                <div class="quiz-icon bg-orange-600/20 text-orange-500">
+                                    ⚡
+                                </div>
+                                
+                                <!-- Quiz Info -->
+                                <div class="flex-1">
+                                    <h3 class="text-lg font-bold mb-1">Physics Basics</h3>
+                                    <p class="text-sm text-gray-400 mb-4">Introduction to fundamental physics concepts</p>
+                                    
+                                    <!-- Quiz Stats -->
+                                    <div class="flex items-center space-x-6 text-sm text-gray-400">
+                                        <div class="flex items-center space-x-2">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
+                                                <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            <span>20 questions</span>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            <span>25 min</span>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"></path>
+                                            </svg>
+                                            <span>45 completions</span>
+                                        </div>
+                                        <div class="flex items-center space-x-2 text-gray-500">
+                                            <span>Created 2 days ago</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="flex items-center space-x-2">
+                                <button class="px-4 py-2 bg-[#0a0a0a] hover:bg-purple-600 border border-[#2a2a2a] rounded-lg text-sm font-medium transition">
+                                    View
+                                </button>
+                                <button class="p-2 hover:bg-[#0a0a0a] rounded-lg transition">
+                                    <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

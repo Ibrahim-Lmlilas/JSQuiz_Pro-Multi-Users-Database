@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Quizzy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: #0a0a0a;
+            color: white;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: #9ca3af;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 4px;
+        }
+
+        .nav-item svg {
+            margin-right: 12px;
+        }
+
+        .nav-item:hover {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .nav-item.active {
+            background: #7c3aed;
+            color: white;
+        }
+
+        .stat-card {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #2a2a2a;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #7c3aed 0%, #a78bfa 100%);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .student-card {
+            transition: all 0.3s ease;
+        }
+
+        .student-card:hover {
+            background: #2a2a2a;
+        }
+
+        .create-quiz-box {
+            border: 2px dashed #3a3a3a;
+            background: transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .create-quiz-box:hover {
+            border-color: #7c3aed;
+            background: rgba(124, 58, 237, 0.05);
+        }
+    </style>
+</head>
+<body class="flex">
+    <!-- Sidebar -->
+    <%- include('../partials/dashboard/admin-sidebar') %>
+
+    <!-- Main Content -->
+    <div class="flex-1 overflow-auto">
+        <!-- Top Bar -->
+        <%- include('../partials/dashboard/navbar') %>
+
+        <!-- Dashboard Content -->
+        <div class="p-8"
+            <!-- Welcome Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold mb-2">Dashboard</h1>
+                <p class="text-gray-400">Welcome back, Sarah! Here's what's happening with your quizzes</p>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-3 gap-6 mb-8">
+                <div class="stat-card">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-gray-400 text-sm">Total Quizzes</span>
+                        <div class="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
+                                <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex items-end justify-between">
+                        <div>
+                            <div class="text-3xl font-bold mb-1">2,543</div>
+                            <div class="text-green-500 text-sm font-medium">+12.5%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-gray-400 text-sm">Students</span>
+                        <div class="w-10 h-10 bg-blue-600/20 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex items-end justify-between">
+                        <div>
+                            <div class="text-3xl font-bold mb-1">2,543</div>
+                            <div class="text-green-500 text-sm font-medium">+12.5%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-gray-400 text-sm">Total Themes</span>
+                        <div class="w-10 h-10 bg-orange-600/20 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex items-end justify-between">
+                        <div>
+                            <div id="totalThemes" class="text-3xl font-bold mb-1">8</div>
+                            <div class="text-gray-500 text-sm font-medium">Active categories</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Events & Top Students -->
+            <div class="grid grid-cols-3 gap-6">
+                <!-- Recent Events -->
+                <div class="col-span-2">
+                    <div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6">
+                        <div class="mb-6">
+                            <h2 class="text-xl font-bold mb-1">Recent Events</h2>
+                            <p class="text-gray-400 text-sm">Manage your upcoming and active quiz events</p>
+                        </div>
+
+                        <!-- Quiz Event Card -->
+                        <div class="bg-[#0a0a0a] border border-[#2a2a2a] rounded-lg p-5 mb-4">
+                            <h3 class="font-semibold text-lg mb-4">Introduction to Biology</h3>
+                            <div class="flex items-center gap-8 mb-4 text-sm text-gray-400">
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
+                                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span>15 questions</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"></path>
+                                    </svg>
+                                    <span>28 completions</span>
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <div class="flex items-center justify-between text-sm mb-2">
+                                    <span class="text-gray-400">Completion Rate</span>
+                                    <span class="font-semibold">90%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 90%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Create New Quiz Box -->
+                        <div class="create-quiz-box rounded-lg p-8 text-center">
+                            <svg class="w-12 h-12 mx-auto mb-3 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"></path>
+                            </svg>
+                            <h3 class="font-semibold mb-1">Create New Quiz</h3>
+                            <p class="text-sm text-gray-500">Add questions, set time limits and publish your quiz</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Students -->
+                <div class="col-span-1">
+                    <div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6">
+                        <div class="mb-6">
+                            <h2 class="text-xl font-bold mb-1">Top Students</h2>
+                            <p class="text-gray-400 text-sm">Students with highest quiz scores</p>
+                        </div>
+
+                        <!-- Student List -->
+                        <div class="space-y-3">
+                            <!-- Student 1 -->
+                            <div class="student-card flex items-center gap-3 p-3 rounded-lg">
+                                <span class="text-gray-500 font-semibold w-6">1</span>
+                                <img src="https://i.pravatar.cc/150?img=1" alt="Alex John" class="w-10 h-10 rounded-full">
+                                <div class="flex-1">
+                                    <div class="font-semibold text-sm">Alex John</div>
+                                    <div class="text-xs text-gray-500">Science</div>
+                                </div>
+                                <div class="flex items-center gap-1 text-orange-500 font-bold">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                    </svg>
+                                    <span>950</span>
+                                </div>
+                            </div>
+
+                            <!-- Student 2 -->
+                            <div class="student-card flex items-center gap-3 p-3 rounded-lg">
+                                <span class="text-gray-500 font-semibold w-6">2</span>
+                                <img src="https://i.pravatar.cc/150?img=5" alt="Emma Watson" class="w-10 h-10 rounded-full">
+                                <div class="flex-1">
+                                    <div class="font-semibold text-sm">Emma Watson</div>
+                                    <div class="text-xs text-gray-500">Mathematics</div>
+                                </div>
+                                <div class="flex items-center gap-1 text-orange-500 font-bold">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                    </svg>
+                                    <span>920</span>
+                                </div>
+                            </div>
+
+                            <!-- Student 3 -->
+                            <div class="student-card flex items-center gap-3 p-3 rounded-lg">
+                                <span class="text-gray-500 font-semibold w-6">3</span>
+                                <img src="https://i.pravatar.cc/150?img=8" alt="Michael Clark" class="w-10 h-10 rounded-full">
+                                <div class="flex-1">
+                                    <div class="font-semibold text-sm">Michael Clark</div>
+                                    <div class="text-xs text-gray-500">Physics</div>
+                                </div>
+                                <div class="flex items-center gap-1 text-orange-500 font-bold">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                    </svg>
+                                    <span>980</span>
+                                </div>
+                            </div>
+
+                            <!-- Student 4 -->
+                            <div class="student-card flex items-center gap-3 p-3 rounded-lg">
+                                <span class="text-gray-500 font-semibold w-6">4</span>
+                                <img src="https://i.pravatar.cc/150?img=9" alt="Sophia Green" class="w-10 h-10 rounded-full">
+                                <div class="flex-1">
+                                    <div class="font-semibold text-sm">Sophia Green</div>
+                                    <div class="text-xs text-gray-500">English</div>
+                                </div>
+                                <div class="flex items-center gap-1 text-orange-500 font-bold">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                    </svg>
+                                    <span>890</span>
+                                </div>
+                            </div>
+
+                            <!-- Student 5 -->
+                            <div class="student-card flex items-center gap-3 p-3 rounded-lg">
+                                <span class="text-gray-500 font-semibold w-6">5</span>
+                                <img src="https://i.pravatar.cc/150?img=10" alt="Lucia Wilde" class="w-10 h-10 rounded-full">
+                                <div class="flex-1">
+                                    <div class="font-semibold text-sm">Lucia Wilde</div>
+                                    <div class="text-xs text-gray-500">Science</div>
+                                </div>
+                                <div class="flex items-center gap-1 text-orange-500 font-bold">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                    </svg>
+                                    <span>870</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load total themes count
+        async function loadThemesCount() {
+            try {
+                const response = await fetch('/api/themes');
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('totalThemes').textContent = data.themes.length;
+                }
+            } catch (error) {
+                console.error('Error loading themes count:', error);
+            }
+        }
+
+        // Load on page load
+        document.addEventListener('DOMContentLoaded', loadThemesCount);
+    </script>
+</body>
+</html>
