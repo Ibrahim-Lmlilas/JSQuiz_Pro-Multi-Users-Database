@@ -4,6 +4,7 @@ const { sequelize } = require("./config/database");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const themeRoutes = require("./routes/themeRoutes");
+const quizRoutes = require("./routes/quizRoutes");
 const auth = require("./middlewares/auth");
 const dotenv = require("dotenv");
 dotenv.config();
@@ -64,6 +65,10 @@ app.get("/admin/quizzes", requireAdmin, async (req, res) => {
   res.render("admin/quizzes");
 });
 
+app.get("/admin/quiz/create", requireAdmin, async (req, res) => {
+  res.render("admin/createQuiz");
+});
+
 app.get("/admin/settings", requireAdmin, async (req, res) => {
   res.render("admin/settings");
 });
@@ -72,6 +77,7 @@ app.get("/admin/settings", requireAdmin, async (req, res) => {
 app.use("/auth", authRoutes);
 app.use("/users", auth.auth, userRoutes);
 app.use("/api/themes", themeRoutes);
+app.use("/api/quizzes", quizRoutes);
 
 app.listen(port, async () => {
   try {

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Quiz - Quizzy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: #0a0a0a;
+            color: white;
+        }
+
+        .answer-option {
+            transition: all 0.3s ease;
+        }
+
+        .answer-option:hover {
+            background: #1a1a1a;
+        }
+
+        .answer-option.correct {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: #10b981;
+        }
+
+        .radio-custom {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #2a2a2a;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .radio-custom.selected {
+            border-color: #7c3aed;
+            background: #7c3aed;
+            position: relative;
+        }
+
+        .radio-custom.selected::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body class="bg-[#0a0a0a] min-h-screen">
+    <!-- Header -->
+    <div class="bg-[#1a1a1a] border-b border-[#2a2a2a] sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-8 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <a href="/admin/quizzes" class="p-2 hover:bg-[#0a0a0a] rounded-lg transition">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </a>
+                    <div>
+                        <h1 class="text-xl font-bold">Create New Quiz</h1>
+                        <p class="text-sm text-gray-400">Add questions, set answers and configure quiz settings</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button id="prevBtn" class="px-6 py-2.5 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white hover:bg-[#0a0a0a] transition flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span>Prev</span>
+                    </button>
+                    <button id="publishBtn" class="px-8 py-2.5 bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-medium transition">
+                        Publish
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-5xl mx-auto px-8 py-8">
+        <!-- Quiz Questions Section -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold mb-2">Quiz Questions</h2>
+            <p class="text-gray-400 text-sm">Create and manage your quiz questions</p>
+        </div>
+
+        <!-- Questions Container -->
+        <div id="questionsContainer" class="space-y-6">
+            <!-- Questions will be rendered here -->
+        </div>
+
+        <!-- Add Question Button -->
+        <button id="addQuestionBtn" class="w-full py-8 border-2 border-dashed border-[#2a2a2a] rounded-xl hover:border-purple-600 hover:bg-purple-600/5 transition flex flex-col items-center justify-center space-y-2 mt-6">
+            <svg class="w-12 h-12 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="font-semibold text-gray-400">Add Question</span>
+        </button>
+    </div>
+
+    <script>
+        // Get quiz ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const quizId = urlParams.get('id');
+
+        if (!quizId) {
+            alert('No quiz ID provided');
+            window.location.href = '/admin/quizzes';
+        }
+
+        // State
+        let questions = [];
+        let questionCount = 0;
+
+        // DOM Elements
+        const questionsContainer = document.getElementById('questionsContainer');
+        const addQuestionBtn = document.getElementById('addQuestionBtn');
+        const publishBtn = document.getElementById('publishBtn');
+        const prevBtn = document.getElementById('prevBtn');
+
+        // Load quiz data
+        document.addEventListener('DOMContentLoaded', () => {
+            loadQuiz();
+            setupEventListeners();
+        });
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            addQuestionBtn.addEventListener('click', addNewQuestion);
+            publishBtn.addEventListener('click', publishQuiz);
+            prevBtn.addEventListener('click', () => window.location.href = '/admin/quizzes');
+        }
+
+        // Load Quiz
+        async function loadQuiz() {
+            try {
+                const response = await fetch(`/api/quizzes/${quizId}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    questions = data.questions || [];
+                    questionCount = questions.length;
+                    renderQuestions();
+                } else {
+                    alert('Failed to load quiz');
+                    window.location.href = '/admin/quizzes';
+                }
+            } catch (error) {
+                console.error('Error loading quiz:', error);
+            }
+        }
+
+        // Render Questions
+        function renderQuestions() {
+            if (questions.length === 0) {
+                questionsContainer.innerHTML = `
+                    <div class="text-center py-12 bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl">
+                        <p class="text-gray-400">No questions yet. Add your first question!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            questionsContainer.innerHTML = questions.map((q, index) => renderQuestionCard(q, index)).join('');
+        }
+
+        // Render Question Card
+        function renderQuestionCard(question, index) {
+            const questionTypes = {
+                single: 'Multiple Choice',
+                multiple: 'Multiple Choice'
+            };
+
+            return `
+                <div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6">
+                    <div class="flex items-start justify-between mb-6">
+                        <div class="flex items-start space-x-4 flex-1">
+                            <div class="bg-purple-600 text-white w-10 h-10 rounded-lg flex items-center justify-center font-bold">
+                                ${index + 1}
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-3 mb-2">
+                                    <span class="text-xs px-2 py-1 bg-purple-600/20 text-purple-400 rounded font-medium">
+                                        ${questionTypes[question.question_type] || 'Multiple Choice'}
+                                    </span>
+                                    <span class="text-xs text-gray-500">Points: ${question.points || 10}</span>
+                                </div>
+                                <p class="text-lg font-semibold mb-4">${question.question_text}</p>
+
+                                <!-- Answer Options -->
+                                <div class="space-y-2">
+                                    ${(question.answers || []).map((answer, i) => `
+                                        <div class="answer-option flex items-center space-x-3 p-3 bg-[#0a0a0a] border ${answer.is_correct ? 'border-green-500' : 'border-[#2a2a2a]'} rounded-lg">
+                                            <div class="radio-custom ${answer.is_correct ? 'selected' : ''}"></div>
+                                            <span>${answer.text}</span>
+                                            ${answer.is_correct ? '<span class="ml-auto text-xs text-green-500 font-medium">✓ Correct</span>' : ''}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="deleteQuestion(${question.id})" class="p-2 hover:bg-red-500/10 rounded-lg text-red-400 transition">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Add New Question
+        function addNewQuestion() {
+            questionCount++;
+            const newQuestionHtml = `
+                <div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6" id="new-question-${questionCount}">
+                    <div class="flex items-start justify-between mb-6">
+                        <div class="flex items-start space-x-4 flex-1">
+                            <div class="bg-purple-600 text-white w-10 h-10 rounded-lg flex items-center justify-center font-bold">
+                                ${questionCount}
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-3 mb-4">
+                                    <label class="text-xs text-gray-400">Points:</label>
+                                    <input 
+                                        type="number" 
+                                        value="10" 
+                                        min="1"
+                                        class="w-20 bg-[#0a0a0a] border border-[#2a2a2a] rounded px-2 py-1 text-sm"
+                                        id="points-${questionCount}"
+                                    >
+                                    <select 
+                                        class="bg-[#0a0a0a] border border-[#2a2a2a] rounded px-3 py-1 text-sm"
+                                        id="type-${questionCount}"
+                                    >
+                                        <option value="single">Multiple Choice</option>
+                                        <option value="multiple">Multiple Choice</option>
+                                    </select>
+                                </div>
+
+                                <!-- Question Text -->
+                                <textarea 
+                                    placeholder="Which of the following is NOT a renewable energy source?"
+                                    class="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-lg p-4 mb-4 resize-none focus:outline-none focus:border-purple-600"
+                                    rows="2"
+                                    id="question-text-${questionCount}"
+                                ></textarea>
+
+                                <!-- Answer Options -->
+                                <div class="space-y-2 mb-4" id="answers-${questionCount}">
+                                    ${generateAnswerInputs(questionCount, 4)}
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="removeNewQuestion(${questionCount})" class="p-2 hover:bg-red-500/10 rounded-lg text-red-400 transition">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Save Button -->
+                    <div class="flex justify-end">
+                        <button onclick="saveQuestion(${questionCount})" class="px-6 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg font-medium transition">
+                            Save Question
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            questionsContainer.insertAdjacentHTML('beforeend', newQuestionHtml);
+            document.getElementById(`new-question-${questionCount}`).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Generate Answer Inputs
+        function generateAnswerInputs(questionId, count) {
+            let html = '';
+            for (let i = 0; i < count; i++) {
+                html += `
+                    <div class="flex items-center space-x-3 p-3 bg-[#0a0a0a] border border-[#2a2a2a] rounded-lg">
+                        <div class="radio-custom" onclick="selectCorrectAnswer(${questionId}, ${i})"></div>
+                        <input 
+                            type="text" 
+                            placeholder="${['Solar Power', 'Wind Power', 'Natural Gas', 'Hydroelectric Power'][i] || 'Answer option'}"
+                            class="flex-1 bg-transparent border-none focus:outline-none"
+                            id="answer-${questionId}-${i}"
+                        >
+                    </div>
+                `;
+            }
+            return html;
+        }
+
+        // Select Correct Answer
+        function selectCorrectAnswer(questionId, answerIndex) {
+            const answersContainer = document.getElementById(`answers-${questionId}`);
+            const radios = answersContainer.querySelectorAll('.radio-custom');
+            radios.forEach((radio, i) => {
+                if (i === answerIndex) {
+                    radio.classList.add('selected');
+                } else {
+                    radio.classList.remove('selected');
+                }
+            });
+        }
+
+        // Save Question
+        async function saveQuestion(questionId) {
+            const questionText = document.getElementById(`question-text-${questionId}`).value;
+            const points = document.getElementById(`points-${questionId}`).value;
+            const type = document.getElementById(`type-${questionId}`).value;
+
+            if (!questionText.trim()) {
+                alert('Please enter a question');
+                return;
+            }
+
+            // Get answers
+            const answers = [];
+            const answersContainer = document.getElementById(`answers-${questionId}`);
+            const answerInputs = answersContainer.querySelectorAll('input[type="text"]');
+            const radios = answersContainer.querySelectorAll('.radio-custom');
+
+            let hasCorrectAnswer = false;
+            answerInputs.forEach((input, i) => {
+                if (input.value.trim()) {
+                    const isCorrect = radios[i].classList.contains('selected');
+                    if (isCorrect) hasCorrectAnswer = true;
+                    answers.push({
+                        text: input.value.trim(),
+                        is_correct: isCorrect
+                    });
+                }
+            });
+
+            if (answers.length < 2) {
+                alert('Please add at least 2 answers');
+                return;
+            }
+
+            if (!hasCorrectAnswer) {
+                alert('Please select the correct answer');
+                return;
+            }
+
+            // Save to database
+            try {
+                const response = await fetch('/api/quizzes/questions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        quiz_id: parseInt(quizId),
+                        question_text: questionText,
+                        question_type: type,
+                        points: parseInt(points),
+                        answers: answers,
+                        order: questionCount
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('✅ Question saved successfully!');
+                    loadQuiz();
+                } else {
+                    alert('❌ ' + (data.message || 'Failed to save question'));
+                }
+            } catch (error) {
+                console.error('Error saving question:', error);
+                alert('❌ Error saving question');
+            }
+        }
+
+        // Remove New Question
+        function removeNewQuestion(questionId) {
+            const element = document.getElementById(`new-question-${questionId}`);
+            if (element) {
+                element.remove();
+            }
+        }
+
+        // Delete Question
+        async function deleteQuestion(id) {
+            if (!confirm('Are you sure you want to delete this question?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/quizzes/questions/${id}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('✅ Question deleted successfully!');
+                    loadQuiz();
+                } else {
+                    alert('❌ ' + (data.message || 'Failed to delete question'));
+                }
+            } catch (error) {
+                console.error('Error deleting question:', error);
+                alert('❌ Error deleting question');
+            }
+        }
+
+        // Publish Quiz
+        async function publishQuiz() {
+            if (questions.length === 0) {
+                alert('Please add at least one question before publishing');
+                return;
+            }
+
+            if (!confirm('Are you sure you want to publish this quiz?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/quizzes/${quizId}/publish`, {
+                    method: 'POST'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('✅ Quiz published successfully!');
+                    window.location.href = '/admin/quizzes';
+                } else {
+                    alert('❌ ' + (data.message || 'Failed to publish quiz'));
+                }
+            } catch (error) {
+                console.error('Error publishing quiz:', error);
+                alert('❌ Error publishing quiz');
+            }
+        }
+
+        // Make functions global
+        window.selectCorrectAnswer = selectCorrectAnswer;
+        window.saveQuestion = saveQuestion;
+        window.removeNewQuestion = removeNewQuestion;
+        window.deleteQuestion = deleteQuestion;
+    </script>
+</body>
+</html>
