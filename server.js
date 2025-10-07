@@ -50,7 +50,19 @@ app.get("/about", (req, res) => {
 
 // Dashboard routes with role protection
 app.get("/user/dashboard", requireUser, async (req, res) => {
-  res.render("userDashboard");
+  res.render("user/dashboard");
+});
+
+app.get("/user/quizzes", requireUser, async (req, res) => {
+  res.render("user/quizzes");
+});
+
+app.get("/user/quiz/take", requireUser, async (req, res) => {
+  res.render("user/takeQuiz");
+});
+
+app.get("/user/quiz/results", requireUser, async (req, res) => {
+  res.render("user/quizResults");
 });
 
 app.get("/admin/dashboard", requireAdmin, async (req, res) => {

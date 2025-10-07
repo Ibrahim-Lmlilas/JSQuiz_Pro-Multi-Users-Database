@@ -9,6 +9,8 @@ function auth(req, res, next) {
         if (err) {
             return res.status(401).json({ message: "Not Authorized" });
         }
+        // Add decoded user info to request object
+        req.user = decoded;
         next();
     });
 }

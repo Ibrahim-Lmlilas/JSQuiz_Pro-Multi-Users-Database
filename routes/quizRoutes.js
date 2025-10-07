@@ -2,8 +2,15 @@ const express = require("express");
 const router = express.Router();
 const quizController = require("../controllers/quizController");
 const { requireAdmin } = require("../middlewares/roleCheck");
+const { auth } = require("../middlewares/auth");
 
-// All quiz routes require admin authentication
+// Public routes for users
+router.get("/published", auth, quizController.getPublishedQuizzes);
+router.get("/:id/take", auth, quizController.getQuizForTaking);
+router.post("/submit", auth, quizController.submitQuizAttempt);
+router.get("/attempts/:id", auth, quizController.getQuizAttempt);
+
+// All other quiz routes require admin authentication
 router.use(requireAdmin);
 
 // Quiz routes

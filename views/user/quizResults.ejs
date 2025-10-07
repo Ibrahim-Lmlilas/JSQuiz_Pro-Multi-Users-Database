@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Results - Quizzy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: white;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            border: 1px solid #2a2a2a;
+            border-radius: 16px;
+            padding: 32px;
+        }
+
+        .stat-card {
+            background: #0a0a0a;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: #7c3aed;
+        }
+
+        .circle-progress {
+            width: 200px;
+            height: 200px;
+            position: relative;
+        }
+
+        .circle-progress svg {
+            transform: rotate(-90deg);
+        }
+
+        .circle-progress circle {
+            fill: none;
+            stroke-width: 10;
+        }
+
+        .circle-bg {
+            stroke: #2a2a2a;
+        }
+
+        .circle-fill {
+            stroke: #7c3aed;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s ease;
+        }
+
+        .pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #7c3aed;
+            position: absolute;
+            animation: confetti-fall 3s linear infinite;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-8">
+    <div class="max-w-4xl w-full">
+        <!-- Loading State -->
+        <div id="loadingState" class="text-center">
+            <div class="inline-block w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+            <p class="text-gray-400">Loading results...</p>
+        </div>
+
+        <!-- Results Content -->
+        <div id="resultsContent" style="display: none;">
+            <!-- Header -->
+            <div class="text-center mb-8 fade-in">
+                <div id="resultIcon" class="w-24 h-24 mx-auto mb-4 rounded-full flex items-center justify-center">
+                    <!-- Icon will be added by JS -->
+                </div>
+                <h1 id="resultTitle" class="text-4xl font-bold mb-2">Quiz Completed!</h1>
+                <p id="resultMessage" class="text-xl text-gray-400">Great job!</p>
+            </div>
+
+            <!-- Score Circle -->
+            <div class="result-card mb-8 fade-in" style="animation-delay: 0.2s;">
+                <div class="flex flex-col items-center justify-center">
+                    <div class="circle-progress mb-6">
+                        <svg width="200" height="200" viewBox="0 0 200 200">
+                            <circle class="circle-bg" cx="100" cy="100" r="90"></circle>
+                            <circle id="circleProgress" class="circle-fill" cx="100" cy="100" r="90" 
+                                    stroke-dasharray="565.48" stroke-dashoffset="565.48"></circle>
+                        </svg>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center">
+                            <span id="scorePercent" class="text-5xl font-bold">0%</span>
+                            <span class="text-gray-400">Score</span>
+                        </div>
+                    </div>
+                    <h2 id="quizTitle" class="text-2xl font-bold mb-2">Quiz Name</h2>
+                    <p id="quizTheme" class="text-gray-400">Theme</p>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="stat-card fade-in" style="animation-delay: 0.3s;">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 bg-green-600/20 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-400">Correct Answers</div>
+                            <div id="correctAnswers" class="text-2xl font-bold">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card fade-in" style="animation-delay: 0.4s;">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 bg-blue-600/20 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
+                                <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-400">Total Questions</div>
+                            <div id="totalQuestions" class="text-2xl font-bold">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card fade-in" style="animation-delay: 0.5s;">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 bg-purple-600/20 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-400">Time Taken</div>
+                            <div id="timeTaken" class="text-2xl font-bold">0:00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pass/Fail Status -->
+            <div id="passFailCard" class="result-card mb-8 fade-in" style="animation-delay: 0.6s;">
+                <div class="text-center">
+                    <p class="text-gray-400 mb-2">Passing Score: <span id="passingScore">70%</span></p>
+                    <p id="passFailText" class="text-2xl font-bold">You Passed! 🎉</p>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center fade-in" style="animation-delay: 0.7s;">
+                <a href="/user/quizzes" class="px-8 py-3 bg-[#1a1a1a] hover:bg-[#2a2a2a] border border-[#2a2a2a] rounded-lg font-medium text-center transition">
+                    Back to Quizzes
+                </a>
+                <a href="/user/dashboard" class="px-8 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-medium text-center transition">
+                    Go to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const attemptId = urlParams.get('attempt');
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!attemptId) {
+                alert('Invalid attempt ID');
+                window.location.href = '/user/quizzes';
+                return;
+            }
+            loadResults();
+        });
+
+        async function loadResults() {
+            try {
+                const response = await fetch(`/api/quizzes/attempts/${attemptId}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    displayResults(data.attempt);
+                } else {
+                    alert('Failed to load results');
+                    window.location.href = '/user/quizzes';
+                }
+            } catch (error) {
+                console.error('Error loading results:', error);
+                alert('Error loading results');
+                window.location.href = '/user/quizzes';
+            }
+        }
+
+        function displayResults(attempt) {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('resultsContent').style.display = 'block';
+
+            const passed = attempt.score >= attempt.quiz.passing_score;
+            const score = Math.round(attempt.score);
+
+            // Set result icon and title
+            const resultIcon = document.getElementById('resultIcon');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultMessage = document.getElementById('resultMessage');
+
+            if (passed) {
+                resultIcon.innerHTML = '<span class="text-6xl">🎉</span>';
+                resultIcon.classList.add('bg-green-600/20');
+                resultTitle.textContent = 'Congratulations!';
+                resultMessage.textContent = 'You passed the quiz!';
+                // Add confetti effect
+                createConfetti();
+            } else {
+                resultIcon.innerHTML = '<span class="text-6xl">😔</span>';
+                resultIcon.classList.add('bg-red-600/20');
+                resultTitle.textContent = 'Keep Trying!';
+                resultMessage.textContent = 'You can do better next time!';
+            }
+
+            // Set score circle
+            document.getElementById('scorePercent').textContent = score + '%';
+            const circumference = 565.48;
+            const offset = circumference - (score / 100) * circumference;
+            setTimeout(() => {
+                document.getElementById('circleProgress').style.strokeDashoffset = offset;
+            }, 100);
+
+            // Set quiz info
+            document.getElementById('quizTitle').textContent = attempt.quiz.title;
+            document.getElementById('quizTheme').textContent = attempt.quiz.theme?.name || 'Quiz';
+
+            // Set stats
+            document.getElementById('correctAnswers').textContent = attempt.correct_answers;
+            document.getElementById('totalQuestions').textContent = attempt.total_questions;
+            
+            // Format time
+            const minutes = Math.floor(attempt.time_taken / 60);
+            const seconds = attempt.time_taken % 60;
+            document.getElementById('timeTaken').textContent = `${minutes}:${String(seconds).padStart(2, '0')}`;
+
+            // Set pass/fail
+            document.getElementById('passingScore').textContent = attempt.quiz.passing_score + '%';
+            const passFailText = document.getElementById('passFailText');
+            const passFailCard = document.getElementById('passFailCard');
+            
+            if (passed) {
+                passFailText.textContent = '✅ You Passed! 🎉';
+                passFailText.classList.add('text-green-500');
+                passFailCard.style.borderColor = '#22c55e';
+            } else {
+                passFailText.textContent = '❌ You Did Not Pass';
+                passFailText.classList.add('text-red-500');
+                passFailCard.style.borderColor = '#ef4444';
+            }
+        }
+
+        function createConfetti() {
+            const colors = ['#7c3aed', '#a855f7', '#22c55e', '#3b82f6', '#eab308'];
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 3 + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 30);
+            }
+        }
+    </script>
+</body>
+</html>

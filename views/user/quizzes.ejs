@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quizzes - Quizzy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: #0a0a0a;
+            color: white;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: #9ca3af;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 4px;
+        }
+
+        .nav-item svg {
+            margin-right: 12px;
+        }
+
+        .nav-item:hover {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .nav-item.active {
+            background: #7c3aed;
+            color: white;
+        }
+
+        .quiz-card {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .quiz-card:hover {
+            transform: translateY(-4px);
+            border-color: #7c3aed;
+            box-shadow: 0 8px 24px rgba(124, 58, 237, 0.2);
+        }
+
+        .quiz-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2a2a2a;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body class="flex">
+    <!-- Sidebar -->
+    <%- include('../partials/dashboard/user-sidebar') %>
+
+    <!-- Main Content -->
+    <div class="flex-1 overflow-auto">
+        <!-- Top Bar -->
+        <%- include('../partials/dashboard/navbar') %>
+
+        <!-- Quizzes Content -->
+        <div class="p-8">
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold mb-2">Available Quizzes</h1>
+                    <p class="text-gray-400">Browse and attempt available quizzes</p>
+                </div>
+            </div>
+
+            <!-- Quiz Library -->
+            <div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6">
+                <!-- Library Header -->
+                <div class="mb-6">
+                    <h2 class="text-xl font-bold mb-1">Quiz Library</h2>
+                    <p class="text-gray-400 text-sm">Browse all available quizzes</p>
+                </div>
+
+                <!-- Quiz Cards -->
+                <div id="quizzesContainer" class="space-y-4">
+                    <div class="text-center py-12">
+                        <p class="text-gray-400">Loading quizzes...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let quizzes = [];
+
+        const colorClasses = {
+            purple: 'bg-purple-600/20 text-purple-500',
+            blue: 'bg-blue-600/20 text-blue-500',
+            green: 'bg-green-600/20 text-green-500',
+            orange: 'bg-orange-600/20 text-orange-500',
+            yellow: 'bg-yellow-600/20 text-yellow-500',
+            pink: 'bg-pink-600/20 text-pink-500',
+            red: 'bg-red-600/20 text-red-500',
+            cyan: 'bg-cyan-600/20 text-cyan-500'
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadQuizzes();
+        });
+
+        async function loadQuizzes() {
+            try {
+                const response = await fetch('/api/quizzes/published');
+                const data = await response.json();
+
+                if (data.success) {
+                    quizzes = data.quizzes;
+                    renderQuizzes();
+                } else {
+                    showError('Failed to load quizzes');
+                }
+            } catch (error) {
+                console.error('Error loading quizzes:', error);
+                showError('Error loading quizzes. Please try again later.');
+            }
+        }
+
+        function renderQuizzes() {
+            const container = document.getElementById('quizzesContainer');
+            
+            if (quizzes.length === 0) {
+                container.innerHTML = '<div class="text-center py-12"><p class="text-gray-400">No quizzes available at the moment.</p></div>';
+                return;
+            }
+
+            container.innerHTML = quizzes.map(q => {
+                const theme = q.theme || {};
+                const colorClass = colorClasses[theme.color] || 'bg-purple-600/20 text-purple-500';
+                const timeAgo = getTimeAgo(q.createdAt);
+                
+                return '<div class="quiz-card">' +
+                    '<div class="flex items-start justify-between">' +
+                    '<div class="flex items-start space-x-4 flex-1">' +
+                    '<div class="quiz-icon ' + colorClass + '">' + (theme.icon || '📚') + '</div>' +
+                    '<div class="flex-1">' +
+                    '<h3 class="text-lg font-bold mb-1">' + escapeHtml(q.title) + '</h3>' +
+                    '<p class="text-sm text-gray-400 mb-4">' + escapeHtml(q.description || 'No description') + '</p>' +
+                    '<div class="flex items-center space-x-6 text-sm text-gray-400">' +
+                    '<span>' + q.question_count + ' questions</span>' +
+                    '<span>' + q.time_limit + ' min</span>' +
+                    '<span>Passing: ' + q.passing_score + '%</span>' +
+                    '<span class="text-gray-500">' + timeAgo + '</span>' +
+                    '</div></div></div>' +
+                    '<div class="flex items-center space-x-2">' +
+                    '<button onclick="startQuiz(' + q.id + ')" class="px-6 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-medium transition">Start Quiz</button>' +
+                    '</div></div></div>';
+            }).join('');
+        }
+
+        function getTimeAgo(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const seconds = Math.floor((now - date) / 1000);
+            if (seconds < 60) return 'just now';
+            if (seconds < 3600) return Math.floor(seconds / 60) + ' minutes ago';
+            if (seconds < 86400) return Math.floor(seconds / 3600) + ' hours ago';
+            if (seconds < 604800) return Math.floor(seconds / 86400) + ' days ago';
+            return date.toLocaleDateString();
+        }
+
+        function startQuiz(quizId) {
+            window.location.href = '/user/quiz/take?id=' + quizId;
+        }
+
+        function showError(message) {
+            document.getElementById('quizzesContainer').innerHTML = 
+                '<div class="text-center py-12">' +
+                '<div class="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4">' +
+                '<svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
+                '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>' +
+                '</svg></div>' +
+                '<h3 class="text-lg font-semibold text-white mb-2">Error Loading Quizzes</h3>' +
+                '<p class="text-gray-400 mb-4">' + message + '</p>' +
+                '<button onclick="loadQuizzes()" class="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition">Try Again</button>' +
+                '</div>';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

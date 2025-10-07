@@ -1,6 +1,56 @@
 const Quiz = require("../models/quizModel");
 const Question = require("../models/questionModel");
 const Theme = require("../models/themeModel");
+const QuizAttempt = require("../models/quizAttemptModel");
+
+// Get published quizzes for regular users
+exports.getPublishedQuizzes = async (req, res) => {
+  try {
+    const quizzes = await Quiz.findAll({
+      where: { status: "published" },
+      include: [
+        {
+          model: Theme,
+          as: "theme",
+          attributes: ["id", "name", "icon", "color"],
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
+
+    // Get question count for each quiz
+    const quizzesWithCount = await Promise.all(
+      quizzes.map(async (quiz) => {
+        const questionCount = await Question.count({
+          where: { quiz_id: quiz.id },
+        });
+
+        return {
+          id: quiz.id,
+          title: quiz.title,
+          description: quiz.description,
+          theme: quiz.theme,
+          time_limit: quiz.time_limit,
+          passing_score: quiz.passing_score,
+          question_count: questionCount,
+          createdAt: quiz.createdAt,
+        };
+      })
+    );
+
+    res.status(200).json({
+      success: true,
+      quizzes: quizzesWithCount,
+    });
+  } catch (error) {
+    console.error("Error fetching published quizzes:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching published quizzes",
+      error: error.message,
+    });
+  }
+};
 
 // Get all quizzes
 exports.getAllQuizzes = async (req, res) => {
@@ -333,6 +383,223 @@ exports.publishQuiz = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error publishing quiz",
+      error: error.message,
+    });
+  }
+};
+
+// Get quiz with questions for taking
+exports.getQuizForTaking = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Get quiz details
+    const quiz = await Quiz.findByPk(id, {
+      include: [
+        {
+          model: Theme,
+          as: "theme",
+          attributes: ["id", "name", "icon", "color"],
+        },
+      ],
+    });
+
+    if (!quiz) {
+      return res.status(404).json({
+        success: false,
+        message: "Quiz not found",
+      });
+    }
+
+    // Check if quiz is published
+    if (quiz.status !== "published") {
+      return res.status(403).json({
+        success: false,
+        message: "This quiz is not available",
+      });
+    }
+
+    // Get questions with answers
+    const questions = await Question.findAll({
+      where: { quiz_id: id },
+      order: [["order", "ASC"]],
+      attributes: ["id", "question_text", "question_type", "points", "order", "answers"],
+    });
+
+    // Randomize questions if enabled
+    if (quiz.randomize_questions) {
+      questions.sort(() => Math.random() - 0.5);
+    }
+
+    res.status(200).json({
+      success: true,
+      quiz: {
+        id: quiz.id,
+        title: quiz.title,
+        description: quiz.description,
+        theme: quiz.theme,
+        time_limit: quiz.time_limit,
+        passing_score: quiz.passing_score,
+        immediate_results: quiz.immediate_results,
+      },
+      questions: questions,
+    });
+  } catch (error) {
+    console.error("Error fetching quiz for taking:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching quiz",
+      error: error.message,
+    });
+  }
+};
+
+// Submit quiz attempt
+exports.submitQuizAttempt = async (req, res) => {
+  try {
+    const { quiz_id, answers, time_taken } = req.body;
+    
+    // Check if user is authenticated
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({
+        success: false,
+        message: "User not authenticated",
+      });
+    }
+    
+    const user_id = req.user.id;
+
+    // Get quiz and questions
+    const quiz = await Quiz.findByPk(quiz_id);
+    if (!quiz) {
+      return res.status(404).json({
+        success: false,
+        message: "Quiz not found",
+      });
+    }
+
+    const questions = await Question.findAll({
+      where: { quiz_id },
+      attributes: ["id", "question_text", "points", "answers"],
+    });
+
+    // Calculate score
+    let correctAnswers = 0;
+    let totalPoints = 0;
+    let earnedPoints = 0;
+    const processedAnswers = {};
+
+    questions.forEach((question) => {
+      totalPoints += question.points;
+      const userAnswer = answers[question.id] || [];
+      const correctIndices = [];
+      
+      // Find correct answers
+      question.answers.forEach((answer, idx) => {
+        if (answer.is_correct) {
+          correctIndices.push(idx);
+        }
+      });
+
+      // Check if user's answer is correct
+      const isCorrect = 
+        userAnswer.length === correctIndices.length &&
+        userAnswer.every((idx) => correctIndices.includes(idx));
+
+      if (isCorrect) {
+        correctAnswers++;
+        earnedPoints += question.points;
+      }
+
+      processedAnswers[question.id] = {
+        selected: userAnswer,
+        correct: correctIndices,
+        isCorrect: isCorrect,
+        points: isCorrect ? question.points : 0,
+      };
+    });
+
+    // Calculate percentage score
+    const score = totalPoints > 0 ? (earnedPoints / totalPoints) * 100 : 0;
+
+    // Create quiz attempt record
+    const attempt = await QuizAttempt.create({
+      user_id,
+      quiz_id,
+      score: score,
+      total_questions: questions.length,
+      correct_answers: correctAnswers,
+      time_taken,
+      status: "completed",
+      started_at: new Date(Date.now() - time_taken * 1000),
+      completed_at: new Date(),
+      answers: processedAnswers,
+    });
+
+    // Update quiz completion count
+    await quiz.update({
+      total_completions: quiz.total_completions + 1,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Quiz submitted successfully",
+      attemptId: attempt.id,
+      score: score,
+      correctAnswers: correctAnswers,
+      totalQuestions: questions.length,
+      passed: score >= quiz.passing_score,
+    });
+  } catch (error) {
+    console.error("Error submitting quiz attempt:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error submitting quiz",
+      error: error.message,
+    });
+  }
+};
+
+// Get quiz attempt results
+exports.getQuizAttempt = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user_id = req.user.id;
+
+    const attempt = await QuizAttempt.findOne({
+      where: { id, user_id },
+      include: [
+        {
+          model: Quiz,
+          as: "quiz",
+          attributes: ["id", "title", "description", "passing_score"],
+          include: [
+            {
+              model: Theme,
+              as: "theme",
+              attributes: ["id", "name", "icon", "color"],
+            },
+          ],
+        },
+      ],
+    });
+
+    if (!attempt) {
+      return res.status(404).json({
+        success: false,
+        message: "Quiz attempt not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      attempt: attempt,
+    });
+  } catch (error) {
+    console.error("Error fetching quiz attempt:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching quiz attempt",
       error: error.message,
     });
   }
