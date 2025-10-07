@@ -76,6 +76,7 @@ app.get("/admin/settings", requireAdmin, async (req, res) => {
 // auth routes
 app.use("/auth", authRoutes);
 app.use("/users", auth.auth, userRoutes);
+app.use("/api/users", userRoutes); // Add API route for users
 app.use("/api/themes", themeRoutes);
 app.use("/api/quizzes", quizRoutes);
 

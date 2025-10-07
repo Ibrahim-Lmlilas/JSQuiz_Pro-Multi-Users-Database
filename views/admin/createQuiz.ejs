@@ -39,6 +39,7 @@
             border-radius: 50%;
             cursor: pointer;
             transition: all 0.3s ease;
+            flex-shrink: 0;
         }
 
         .radio-custom.selected {
@@ -54,6 +55,33 @@
             height: 8px;
             background: white;
             border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .checkbox-custom {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #2a2a2a;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .checkbox-custom.selected {
+            border-color: #7c3aed;
+            background: #7c3aed;
+            position: relative;
+        }
+
+        .checkbox-custom.selected::after {
+            content: '✓';
+            position: absolute;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
@@ -182,7 +210,7 @@
         // Render Question Card
         function renderQuestionCard(question, index) {
             const questionTypes = {
-                single: 'Multiple Choice',
+                single: 'Single Choice',
                 multiple: 'Multiple Choice'
             };
 
@@ -196,7 +224,7 @@
                             <div class="flex-1">
                                 <div class="flex items-center space-x-3 mb-2">
                                     <span class="text-xs px-2 py-1 bg-purple-600/20 text-purple-400 rounded font-medium">
-                                        ${questionTypes[question.question_type] || 'Multiple Choice'}
+                                        ${questionTypes[question.question_type] || 'Single Choice'}
                                     </span>
                                     <span class="text-xs text-gray-500">Points: ${question.points || 10}</span>
                                 </div>
@@ -206,7 +234,7 @@
                                 <div class="space-y-2">
                                     ${(question.answers || []).map((answer, i) => `
                                         <div class="answer-option flex items-center space-x-3 p-3 bg-[#0a0a0a] border ${answer.is_correct ? 'border-green-500' : 'border-[#2a2a2a]'} rounded-lg">
-                                            <div class="radio-custom ${answer.is_correct ? 'selected' : ''}"></div>
+                                            <div class="${question.question_type === 'single' ? 'radio-custom' : 'checkbox-custom'} ${answer.is_correct ? 'selected' : ''}"></div>
                                             <span>${answer.text}</span>
                                             ${answer.is_correct ? '<span class="ml-auto text-xs text-green-500 font-medium">✓ Correct</span>' : ''}
                                         </div>
@@ -247,9 +275,10 @@
                                     <select 
                                         class="bg-[#0a0a0a] border border-[#2a2a2a] rounded px-3 py-1 text-sm"
                                         id="type-${questionCount}"
+                                        onchange="updateAnswerInputs(${questionCount}, this.value)"
                                     >
-                                        <option value="single">Multiple Choice</option>
-                                        <option value="multiple">Multiple Choice</option>
+                                        <option value="single">Single Choice (One Answer)</option>
+                                        <option value="multiple">Multiple Choice (Multiple Answers)</option>
                                     </select>
                                 </div>
 
@@ -288,12 +317,12 @@
         }
 
         // Generate Answer Inputs
-        function generateAnswerInputs(questionId, count) {
+        function generateAnswerInputs(questionId, count, type = 'single') {
             let html = '';
             for (let i = 0; i < count; i++) {
                 html += `
                     <div class="flex items-center space-x-3 p-3 bg-[#0a0a0a] border border-[#2a2a2a] rounded-lg">
-                        <div class="radio-custom" onclick="selectCorrectAnswer(${questionId}, ${i})"></div>
+                        <div class="${type === 'single' ? 'radio-custom' : 'checkbox-custom'}" onclick="selectCorrectAnswer(${questionId}, ${i})"></div>
                         <input 
                             type="text" 
                             placeholder="${['Solar Power', 'Wind Power', 'Natural Gas', 'Hydroelectric Power'][i] || 'Answer option'}"
@@ -306,17 +335,59 @@
             return html;
         }
 
+        // Update Answer Inputs when type changes
+        function updateAnswerInputs(questionId, type) {
+            const answersContainer = document.getElementById(`answers-${questionId}`);
+            const currentInputs = [];
+            
+            // Save current values
+            answersContainer.querySelectorAll('input[type="text"]').forEach((input, i) => {
+                currentInputs.push(input.value);
+            });
+            
+            // Get current selections
+            const selections = [];
+            answersContainer.querySelectorAll('.radio-custom, .checkbox-custom').forEach((el, i) => {
+                if (el.classList.contains('selected')) {
+                    selections.push(i);
+                }
+            });
+            
+            // Regenerate with new type
+            answersContainer.innerHTML = generateAnswerInputs(questionId, currentInputs.length || 4, type);
+            
+            // Restore values
+            currentInputs.forEach((value, i) => {
+                const input = document.getElementById(`answer-${questionId}-${i}`);
+                if (input) input.value = value;
+            });
+            
+            // Restore selections
+            selections.forEach(index => {
+                const el = answersContainer.querySelectorAll('.radio-custom, .checkbox-custom')[index];
+                if (el) el.classList.add('selected');
+            });
+        }
+
         // Select Correct Answer
         function selectCorrectAnswer(questionId, answerIndex) {
             const answersContainer = document.getElementById(`answers-${questionId}`);
-            const radios = answersContainer.querySelectorAll('.radio-custom');
-            radios.forEach((radio, i) => {
-                if (i === answerIndex) {
-                    radio.classList.add('selected');
-                } else {
-                    radio.classList.remove('selected');
-                }
-            });
+            const type = document.getElementById(`type-${questionId}`).value;
+            const selectors = answersContainer.querySelectorAll('.radio-custom, .checkbox-custom');
+            
+            if (type === 'single') {
+                // Single choice: only one can be selected
+                selectors.forEach((el, i) => {
+                    if (i === answerIndex) {
+                        el.classList.add('selected');
+                    } else {
+                        el.classList.remove('selected');
+                    }
+                });
+            } else {
+                // Multiple choice: toggle selection
+                selectors[answerIndex].classList.toggle('selected');
+            }
         }
 
         // Save Question
@@ -334,12 +405,12 @@
             const answers = [];
             const answersContainer = document.getElementById(`answers-${questionId}`);
             const answerInputs = answersContainer.querySelectorAll('input[type="text"]');
-            const radios = answersContainer.querySelectorAll('.radio-custom');
+            const selectors = answersContainer.querySelectorAll('.radio-custom, .checkbox-custom');
 
             let hasCorrectAnswer = false;
             answerInputs.forEach((input, i) => {
                 if (input.value.trim()) {
-                    const isCorrect = radios[i].classList.contains('selected');
+                    const isCorrect = selectors[i].classList.contains('selected');
                     if (isCorrect) hasCorrectAnswer = true;
                     answers.push({
                         text: input.value.trim(),
@@ -354,8 +425,17 @@
             }
 
             if (!hasCorrectAnswer) {
-                alert('Please select the correct answer');
+                alert('Please select at least one correct answer');
                 return;
+            }
+
+            // For single choice, ensure only ONE correct answer
+            if (type === 'single') {
+                const correctCount = answers.filter(a => a.is_correct).length;
+                if (correctCount > 1) {
+                    alert('Single choice questions can only have ONE correct answer');
+                    return;
+                }
             }
 
             // Save to database
