@@ -54,11 +54,11 @@ async function registerController(req, res) {
   }
 }
 
-async function loginController(req, res) {
+async function loginController(req, res) {  
   try {
     const { email, password } = req.body;
 
-    //   check if body is empty
+    //   check if body is empty 
     if (!email || !password) {
       console.log("Please insert everything");
       return res.status(400).send("Please fill all fields");

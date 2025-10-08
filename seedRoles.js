@@ -5,16 +5,13 @@ const { sequelize } = require('./config/database');
 
 async function seedRoles() {
   try {
-    // Sync database
     await sequelize.sync();
     
-    // Check if roles exist
     const existingRoles = await Role.findAll();
     
     if (existingRoles.length === 0) {
       console.log('Creating default roles...');
       
-      // Create default roles
       await Role.bulkCreate([
         { id: 1, name: 'user' },
         { id: 2, name: 'admin' },
@@ -25,7 +22,6 @@ async function seedRoles() {
       console.log('✓ Roles already exist in database');
     }
     
-    // Display existing roles
     const roles = await Role.findAll();
     console.log('\nExisting roles:');
     roles.forEach(role => {
